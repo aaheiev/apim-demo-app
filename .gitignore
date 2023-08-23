@@ -1,3 +1,5 @@
+tmp/
+**/templates.1
 target/
 pom.xml.tag
 pom.xml.releaseBackup
