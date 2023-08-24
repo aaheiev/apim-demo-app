@@ -35,9 +35,9 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/greet")
-    public ResponseEntity<String> greet(@RequestParam String name) {
-        String greeting = apiService.greet(name);
+    @GetMapping("/mirror-name")
+    public ResponseEntity<String> mirrorName(@RequestParam String name) {
+        String greeting = apiService.mirrorName(name);
         return ResponseEntity.ok(greeting);
     }
 }

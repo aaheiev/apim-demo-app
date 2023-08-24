@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiService {
 
-    public String greet(String name) {
-        return "Hello, " + name + "!";
+    public String mirrorName(String name) {
+        if (name == null) {
+            return null;
+        }
+        return name + "|"+ new StringBuilder(name).reverse();
     }
 }

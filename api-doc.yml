@@ -19,11 +19,17 @@ paths:
             "*/*":
               schema:
                 type: string
-  "/health":
+  "/mirror-name":
     get:
       tags:
         - api-controller
-      operationId: healthCheck
+      operationId: mirrorName
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -31,17 +37,11 @@ paths:
             "*/*":
               schema:
                 type: string
-  "/greet":
+  "/health":
     get:
       tags:
         - api-controller
-      operationId: greet
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
+      operationId: healthCheck
       responses:
         '200':
           description: OK
