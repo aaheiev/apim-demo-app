@@ -10,9 +10,14 @@ name: Develop
 
 on:
   push:
-    branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+    branches:
+      - develop
+      - version1
+      - version2
+      - version3
+
+#  pull_request:
+#    branches: [ "develop" ]
 
 jobs:
   build:
@@ -26,11 +31,11 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'temurin'
+        distribution: temurin
         cache: maven
 
     - name: Build
-      run: mvn -B package --file pom.xml
+      run: mvn clean install
 
     # # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     # - name: Update dependency graph
