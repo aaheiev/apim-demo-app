@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+{{ include "apim-demo-app.labels" . | indent 4 }}
+data:
+  openApiSpec.yaml: |
+{{ .Values.apim.openApiSpec | nindent 4 }}
+  apiInformation.json: |
+{{ .Values.apim.apiInformation | nindent 4 }}

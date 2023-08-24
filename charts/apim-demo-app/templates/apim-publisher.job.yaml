@@ -1,0 +1,35 @@
+{{- if .Values.apimPublisher.enable -}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-publisher"
+  labels:
+    {{- include "apim-demo-app.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        {{- include "apim-demo-app.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: publisher
+          image: {{ .Values.apimPublisher.image }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - sleep
+            - "60"
+          volumeMounts:
+            - name: apim-config
+              mountPath: /etc/apim
+      volumes:
+        - name: apim-config
+          configMap:
+            name: {{ .Release.Name }}
+{{- end }}
