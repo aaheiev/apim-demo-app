@@ -31,22 +31,4 @@ paths:
             "*/*":
               schema:
                 type: string
-  "/greet":
-    get:
-      tags:
-        - api-controller
-      operationId: greet
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            "*/*":
-              schema:
-                type: string
 components: {}
