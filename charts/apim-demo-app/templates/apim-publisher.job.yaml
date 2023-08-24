@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sleep
-            - "60"
+            - "90"
           volumeMounts:
             - name: apim-config
               mountPath: /etc/apim

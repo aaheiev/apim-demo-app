@@ -10,3 +10,7 @@ data:
 {{ .Values.apim.openApiSpec | nindent 4 }}
   apiInformation.json: |
 {{ .Values.apim.apiInformation | nindent 4 }}
+  policy.xml: |
+{{ .Values.apim.policy | nindent 4 }}
+  apis.json: |
+{{ .Values.apim.apis | nindent 4 }}
