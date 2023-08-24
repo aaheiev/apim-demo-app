@@ -35,9 +35,9 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/greet")
-    public ResponseEntity<String> greet(@RequestParam String name) {
-        String greeting = apiService.greet(name);
+    @GetMapping("/reverse-name")
+    public ResponseEntity<String> reverseName(@RequestParam String name) {
+        String greeting = apiService.reverseName(name);
         return ResponseEntity.ok(greeting);
     }
 }
