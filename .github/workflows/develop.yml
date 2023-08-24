@@ -59,7 +59,8 @@ jobs:
         helm_artifact=$(basename -- $(echo $helm_package_output | awk '{ print $NF}'))
         echo $helm_artifact
         echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_OUTPUT
+        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_ENV
 
     - name: Publish helm chart
       shell: bash
-      run: echo "Publish helm chart"
+      run: echo "Publish helm chart ${{ env.helm_artifact }}"
