@@ -1,0 +1,6 @@
+apiVersion: v2
+name: apim-demo-app
+description: apim-demo-app helm chart
+type: application
+version: 0.1.10
+appVersion: 0.0.5-SNAPSHOT
