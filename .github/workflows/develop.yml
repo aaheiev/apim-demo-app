@@ -37,6 +37,7 @@ jobs:
     - name: Set version
       id: config
       run: |
+        MVN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
         VERSION="0.0.${{ github.run_number }}-dev"
         echo "VERSION=$(echo $VERSION)" >> $GITHUB_ENV
         echo "VERSION=$(echo $VERSION)" >> $GITHUB_OUTPUT
@@ -45,8 +46,8 @@ jobs:
     - name: Show version
       run: echo ${{ env.VERSION }}
 
-    - name: Maven Build
-      run: mvn clean install -q
+#    - name: Maven Build
+#      run: mvn clean install -q
 
     # # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     # - name: Update dependency graph
