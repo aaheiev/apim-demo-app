@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+  push:
 
 jobs:
   touch_cluster:
@@ -16,15 +17,12 @@ jobs:
       - name: Azure login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_AKS_USER }}
+          creds: ${{ secrets.AZURE_AKS_USER_DEV }}
 
       - name: Get Kubeconfig
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-            az aks get-credentials --resource-group apim-backend --name apim-backend-aks --file /tmp/apim-kubeconfig
-      
+        run: |
+          az aks get-credentials --resource-group apim-backend --name apim-backend-aks --file /tmp/apim-kubeconfig
+
       - name: Touch cluster
         run: |
           kubectl --kubeconfig /tmp/apim-kubeconfig get ns
