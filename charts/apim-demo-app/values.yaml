@@ -44,7 +44,9 @@ autoscaling:
 
 apimPublisher:
   enable: true
-  image: alpine
+  image: gcacrapim.azurecr.io/apim-publisher
+  version: 4.9.0-1
+  accessSecret: apim-access
 
 apim:
   openApiSpec: |

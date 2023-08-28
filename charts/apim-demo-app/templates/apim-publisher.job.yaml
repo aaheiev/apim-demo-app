@@ -20,11 +20,14 @@ spec:
       restartPolicy: Never
       containers:
         - name: publisher
-          image: {{ .Values.apimPublisher.image }}
+          image: {{ .Values.apimPublisher.image }}:{{ .Values.apimPublisher.version }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sleep
             - "90"
+          envFrom:
+            - secretRef:
+                name: {{ .Values.apimPublisher.accessSecret }}
           volumeMounts:
             - name: apim-config
               mountPath: /etc/apim
