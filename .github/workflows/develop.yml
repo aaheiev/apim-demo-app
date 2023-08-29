@@ -78,7 +78,7 @@ jobs:
       run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/charts
 
   deploy-dev:
-    name: Build
+    name: Deploy Dev
     runs-on: ubuntu-latest
     needs: [build]
     environment: dev
