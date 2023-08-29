@@ -58,18 +58,18 @@ jobs:
       shell: bash
       run: docker push ${{ env.IMAGE_URL }}:${{ env.VERSION }}
 
-#    - name: Package helm chart
-#      id: helm_package
-#      shell: bash
-#      run: |
-#        helm_package_output=$(helm package charts/${{ vars.HELM_CHART_NAME }} \
-#          --app-version ${{ env.VERSION }} \
-#          --version ${{ env.VERSION }})
-#        helm_artifact=$(basename -- $(echo $helm_package_output | awk '{ print $NF}'))
-#        echo $helm_artifact
-#        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_OUTPUT
-#        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_ENV
-#
-#    - name: Publish helm chart
-#      shell: bash
-#      run: echo "Publish helm chart ${{ env.helm_artifact }}"
+    - name: Package helm chart
+      id: helm_package
+      shell: bash
+      run: |
+        helm_package_output=$(helm package charts/${{ vars.HELM_CHART_NAME }} \
+          --app-version ${{ env.VERSION }} \
+          --version ${{ env.VERSION }})
+        helm_artifact=$(basename -- $(echo $helm_package_output | awk '{ print $NF}'))
+        echo $helm_artifact
+        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_OUTPUT
+        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_ENV
+
+    - name: Publish helm chart
+      shell: bash
+      run: echo "Publish helm chart ${{ env.helm_artifact }}"
