@@ -12,6 +12,8 @@ jobs:
     env:
       IMAGE_URL: ${{ vars.ACR_NAME }}.azurecr.io/${{ vars.CONTAINER_IMAGE_NAME }}
       HELM_EXPERIMENTAL_OCI: 1
+    outputs:
+      version: ${{ steps.config.outputs.VERSION }}
     steps:
     - uses: actions/checkout@v3
 
@@ -75,9 +77,26 @@ jobs:
       shell: bash
       run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/charts
 
-      # https://github.com/backbase-common/backbase-library/blob/main/.github/workflows/publish-helm-chart.yaml
-      # helm upgrade --install apim-demo --repo https://....
-      # az acr login -n gcacrapim.azurecr.io  -t -ojson | jq -r .accessToken | helm registry login gcacrapim.azurecr.io -u 00000000-0000-0000-0000-000000000000 --password-stdin
-      
-      # helm upgrade --install apim-demo --repo https://....
+  deploy-dev:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment: dev
+    env:
+      VERSION: ${{ needs.build.outputs.VERSION }}
+    steps:
+      - name: Get apiops code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          repository: 'lucashuet93/apiops-vnet-github'
+          path: './apiops'
 
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CI }}
+
+      - name: Helm repo login
+        run: |
+          az acr login -n ${{ vars.ACR_NAME }}.azurecr.io  -t -ojson | jq -r .accessToken | helm registry login ${{ vars.ACR_NAME }}.azurecr.io -u 00000000-0000-0000-0000-000000000000 --password-stdin
