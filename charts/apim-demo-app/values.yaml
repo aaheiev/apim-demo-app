@@ -42,10 +42,11 @@ autoscaling:
   targetMemoryUtilizationPercentage: 85
 
 apimPublisher:
-  enable: true
+  enable: false
   image: gcacrapim.azurecr.io/apim-publisher
   version: 4.9.0-4
   accessSecret: apim-access
+  jobSleep: 10
 
 apim:
   openApiSpec: |

@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sleep
-            - "5"
+            - "{{ .Values.apimPublisher.jobSleep }}"
           env:
             - name: API_MANAGEMENT_SERVICE_OUTPUT_FOLDER_PATH
               value: /apimartifacts
