@@ -73,4 +73,11 @@ jobs:
 
     - name: Publish helm chart
       shell: bash
-      run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/helm/v1/repo
+      run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/charts
+
+      # https://github.com/backbase-common/backbase-library/blob/main/.github/workflows/publish-helm-chart.yaml
+      # helm upgrade --install apim-demo --repo https://....
+      # az acr login -n gcacrapim.azurecr.io  -t -ojson | jq -r .accessToken | helm registry login gcacrapim.azurecr.io -u 00000000-0000-0000-0000-000000000000 --password-stdin
+      
+      # helm upgrade --install apim-demo --repo https://....
+
