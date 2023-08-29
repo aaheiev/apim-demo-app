@@ -97,6 +97,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CI }}
 
+      - name: Login AKS
+        run: |
+          az aks get-credentials --resource-group ${{ vars.AKS_RG }} --name ${{ vars.AKS_NAME }}
+
       - name: Helm repo login
         run: |
           az acr login -n ${{ vars.ACR_NAME }}.azurecr.io  -t -ojson | jq -r .accessToken | helm registry login ${{ vars.ACR_NAME }}.azurecr.io -u 00000000-0000-0000-0000-000000000000 --password-stdin
