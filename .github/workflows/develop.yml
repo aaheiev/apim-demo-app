@@ -13,70 +13,70 @@ jobs:
       IMAGE_URL: ${{ vars.ACR_NAME }}.azurecr.io/${{ vars.CONTAINER_IMAGE_NAME }}
       HELM_EXPERIMENTAL_OCI: 1
     outputs:
-#      version: ${{ steps.config.outputs.VERSION }}
-      version: 0.0.1-34
+      version: ${{ steps.config.outputs.VERSION }}
+#      version: 0.0.1-34
     steps:
     - uses: actions/checkout@v3
 
-#    - name: Azure login
-#      uses: azure/login@v1
-#      with:
-#        creds: ${{ secrets.AZURE_CI }}
-#
-#    - name: Login ACR
-#      run: az acr login --name ${{ vars.ACR_NAME }}
-#
-#    - name: Set up JDK 17
-#      uses: actions/setup-java@v3
-#      with:
-#        java-version: '17'
-#        distribution: temurin
-#        cache: maven
-#
-#    - name: Set version
-#      id: config
-#      run: |
-#        MVN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-#        echo "MVN_VERSION=$(echo $MVN_VERSION)" >> $GITHUB_ENV
-#        echo "MVN_VERSION=$(echo $MVN_VERSION)"
-#        MVN_RELEASE_VERSION=$(echo ${MVN_VERSION%%-*})
-#        echo "MVN_RELEASE_VERSION=$(echo ${MVN_RELEASE_VERSION})"
-#        VERSION="${MVN_RELEASE_VERSION}-${{ github.run_number }}"
-#        echo "VERSION=$(echo $VERSION)" >> $GITHUB_ENV
-#        echo "VERSION=$(echo $VERSION)" >> $GITHUB_OUTPUT
-#        echo "VERSION=$(echo $VERSION)"
-#
-#    - name: Maven Build
-#      run: mvn clean install -q
-#
-#    - name: Docker Build
-#      run: |
-#        echo "VERSION=${{ env.VERSION }}"
-#        echo "MVN_VERSION=${{ env.MVN_VERSION }}"
-#        docker build --platform linux/amd64 \
-#          --build-arg mvn_version=${{ env.MVN_VERSION }} \
-#          --build-arg version=${{ env.VERSION }} \
-#          -t ${{ env.IMAGE_URL }}:${{ env.VERSION }} .
-#
-#    - name: Docker Publish
-#      shell: bash
-#      run: docker push ${{ env.IMAGE_URL }}:${{ env.VERSION }}
-#
-#    - name: Package helm chart
-#      id: helm_package
-#      shell: bash
-#      run: |
-#        helm_package_output=$(helm package charts/${{ vars.HELM_CHART_NAME }} \
-#          --app-version ${{ env.VERSION }} \
-#          --version ${{ env.VERSION }})
-#        helm_artifact=$(basename -- $(echo $helm_package_output | awk '{ print $NF}'))
-#        echo $helm_artifact
-#        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_OUTPUT
-#        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_ENV
-#
-#    - name: Publish helm chart
-#      shell: bash
-#      run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/charts
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CI }}
+
+    - name: Login ACR
+      run: az acr login --name ${{ vars.ACR_NAME }}
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: temurin
+        cache: maven
+
+    - name: Set version
+      id: config
+      run: |
+        MVN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "MVN_VERSION=$(echo $MVN_VERSION)" >> $GITHUB_ENV
+        echo "MVN_VERSION=$(echo $MVN_VERSION)"
+        MVN_RELEASE_VERSION=$(echo ${MVN_VERSION%%-*})
+        echo "MVN_RELEASE_VERSION=$(echo ${MVN_RELEASE_VERSION})"
+        VERSION="${MVN_RELEASE_VERSION}-${{ github.run_number }}"
+        echo "VERSION=$(echo $VERSION)" >> $GITHUB_ENV
+        echo "VERSION=$(echo $VERSION)" >> $GITHUB_OUTPUT
+        echo "VERSION=$(echo $VERSION)"
+
+    - name: Maven Build
+      run: mvn clean install -q
+
+    - name: Docker Build
+      run: |
+        echo "VERSION=${{ env.VERSION }}"
+        echo "MVN_VERSION=${{ env.MVN_VERSION }}"
+        docker build --platform linux/amd64 \
+          --build-arg mvn_version=${{ env.MVN_VERSION }} \
+          --build-arg version=${{ env.VERSION }} \
+          -t ${{ env.IMAGE_URL }}:${{ env.VERSION }} .
+
+    - name: Docker Publish
+      shell: bash
+      run: docker push ${{ env.IMAGE_URL }}:${{ env.VERSION }}
+
+    - name: Package helm chart
+      id: helm_package
+      shell: bash
+      run: |
+        helm_package_output=$(helm package charts/${{ vars.HELM_CHART_NAME }} \
+          --app-version ${{ env.VERSION }} \
+          --version ${{ env.VERSION }})
+        helm_artifact=$(basename -- $(echo $helm_package_output | awk '{ print $NF}'))
+        echo $helm_artifact
+        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_OUTPUT
+        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_ENV
+
+    - name: Publish helm chart
+      shell: bash
+      run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/charts
 
   deploy-dev:
     name: Deploy Dev
@@ -85,6 +85,7 @@ jobs:
     environment: dev
     env:
       VERSION: ${{ needs.build.outputs.VERSION }}
+      HELM_VALUES_FILE: ./apiops/.deploy/dev.yaml
     steps:
       - name: Get apiops code
         uses: actions/checkout@v3
@@ -93,28 +94,24 @@ jobs:
           repository: lucashuet93/apiops-vnet-github
           path: ./apiops
 
-      - name: List env helm values
-        run: |
-          ls -alph ./apiops/.deploy
-          
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CI }}
 
-#      - name: Azure login
-#        uses: azure/login@v1
-#        with:
-#          creds: ${{ secrets.AZURE_CI }}
-#
-#      - name: Login AKS
-#        run: |
-#          az aks get-credentials --resource-group ${{ vars.AKS_RG }} --name ${{ vars.AKS_NAME }}
-#
-#      - name: Helm repo login
-#        run: |
-#          az acr login -n ${{ vars.ACR_NAME }}.azurecr.io  -t -ojson \
-#            | jq -r .accessToken | helm registry login ${{ vars.ACR_NAME }}.azurecr.io \
-#            -u 00000000-0000-0000-0000-000000000000 --password-stdin
-#
-#      - name: Install HELM release
-#        run: |
-#          helm -n ${{ vars.KUBERNETES_NAMESPACE }} upgrade --install apim-demo-app oci://${{ vars.ACR_NAME }}.azurecr.io/charts/${{ vars.HELM_CHART_NAME }} \
-#            --version ${{ env.VERSION }} \
-#            --wait
+      - name: Login AKS
+        run: |
+          az aks get-credentials --resource-group ${{ vars.AKS_RG }} --name ${{ vars.AKS_NAME }}
+
+      - name: Helm repo login
+        run: |
+          az acr login -n ${{ vars.ACR_NAME }}.azurecr.io  -t -ojson \
+            | jq -r .accessToken | helm registry login ${{ vars.ACR_NAME }}.azurecr.io \
+            -u 00000000-0000-0000-0000-000000000000 --password-stdin
+
+      - name: Install HELM release
+        run: |
+          helm -n ${{ vars.KUBERNETES_NAMESPACE }} upgrade --install apim-demo-app oci://${{ vars.ACR_NAME }}.azurecr.io/charts/${{ vars.HELM_CHART_NAME }} \
+            -f ${{ env.HELM_VALUES_FILE }} \
+            --version ${{ env.VERSION }} \
+            --wait
