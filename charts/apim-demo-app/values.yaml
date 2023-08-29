@@ -7,7 +7,6 @@ image:
   pullPolicy: IfNotPresent
   tag: ""
 
-
 service:
   type: ClusterIP
   port: 80
@@ -43,11 +42,14 @@ autoscaling:
   targetMemoryUtilizationPercentage: 85
 
 apimPublisher:
-  enable: true
-  image: alpine
+  enable: false
+  image: gcacrapim.azurecr.io/apim-publisher
+  version: 4.9.0-4
+  accessSecret: apim-access
+  jobSleep: 10
 
 apim:
-  openApiSpec: |
+  openApiSpec: |-
     ---
     openapi: 3.0.1
     info:
@@ -100,7 +102,7 @@ apim:
                   schema:
                     type: string
     components: {}
-  apiInformation: |
+  apiInformation: |-
     {
       "properties": {
         "apiRevision": "1",
@@ -130,7 +132,7 @@ apim:
       }
     }
 
-  policy: |
+  policy: |-
     <policies>
     	<inbound />
     	<backend>
@@ -139,7 +141,7 @@ apim:
     	<outbound />
     </policies>
 
-  apis: |
+  apis: |-
     [
       {
         "name": "swagger-petstore"

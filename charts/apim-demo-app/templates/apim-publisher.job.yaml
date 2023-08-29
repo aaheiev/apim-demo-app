@@ -20,14 +20,20 @@ spec:
       restartPolicy: Never
       containers:
         - name: publisher
-          image: {{ .Values.apimPublisher.image }}
+          image: {{ .Values.apimPublisher.image }}:{{ .Values.apimPublisher.version }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sleep
-            - "90"
+            - "{{ .Values.apimPublisher.jobSleep }}"
+          env:
+            - name: API_MANAGEMENT_SERVICE_OUTPUT_FOLDER_PATH
+              value: /apimartifacts
+          envFrom:
+            - secretRef:
+                name: {{ .Values.apimPublisher.accessSecret }}
           volumeMounts:
             - name: apim-config
-              mountPath: /etc/apim
+              mountPath: apimartifacts
       volumes:
         - name: apim-config
           configMap:
