@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - version1
 
 jobs:
   build:
@@ -15,82 +16,67 @@ jobs:
     outputs:
       version: ${{ steps.config.outputs.VERSION }}
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Azure login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CI }}
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CI }}
 
-    - name: Login ACR
-      run: az acr login --name ${{ vars.ACR_NAME }}
+      - name: Login ACR
+        run: az acr login --name ${{ vars.ACR_NAME }}
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: temurin
-        cache: maven
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
 
-    - name: Set version
-      id: config
-      run: |
-        MVN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-<<<<<<< HEAD
-        MVN_VERSION=$(echo ${MVN_VERSION%%-*})
-        echo "MVN_VERSION=$(echo ${MVN_VERSION})"
-        VERSION="${MVN_VERSION}-dev.${{ github.run_number }}"
-        echo "VERSION=$(echo $VERSION)" >> $GITHUB_ENV
-        echo "VERSION=$(echo $VERSION)" >> $GITHUB_OUTPUT
-        echo "VERSION=$(echo $VERSION)"
+      - name: Set version
+        id: config
+        run: |
+          MVN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "MVN_VERSION=$(echo $MVN_VERSION)" >> $GITHUB_ENV
+          echo "MVN_VERSION=$(echo $MVN_VERSION)"
+          MVN_RELEASE_VERSION=$(echo ${MVN_VERSION%%-*})
+          echo "MVN_RELEASE_VERSION=$(echo ${MVN_RELEASE_VERSION})"
+          VERSION="${MVN_RELEASE_VERSION}-${{ github.run_number }}"
+          echo "VERSION=$(echo $VERSION)" >> $GITHUB_ENV
+          echo "VERSION=$(echo $VERSION)" >> $GITHUB_OUTPUT
+          echo "VERSION=$(echo $VERSION)"
 
-    - name: Show version
-      run: echo ${{ env.VERSION }}
+      - name: Maven Build
+        run: mvn clean install -q
 
-#    - name: Maven Build
-#      run: mvn clean install -q
-=======
-        echo "MVN_VERSION=$(echo $MVN_VERSION)" >> $GITHUB_ENV
-        echo "MVN_VERSION=$(echo $MVN_VERSION)"
-        MVN_RELEASE_VERSION=$(echo ${MVN_VERSION%%-*})
-        echo "MVN_RELEASE_VERSION=$(echo ${MVN_RELEASE_VERSION})"
-        VERSION="${MVN_RELEASE_VERSION}-${{ github.run_number }}"
-        echo "VERSION=$(echo $VERSION)" >> $GITHUB_ENV
-        echo "VERSION=$(echo $VERSION)" >> $GITHUB_OUTPUT
-        echo "VERSION=$(echo $VERSION)"
->>>>>>> develop
+      - name: Docker Build
+        run: |
+          echo "VERSION=${{ env.VERSION }}"
+          echo "MVN_VERSION=${{ env.MVN_VERSION }}"
+          docker build --platform linux/amd64 \
+            --build-arg mvn_version=${{ env.MVN_VERSION }} \
+            --build-arg version=${{ env.VERSION }} \
+            -t ${{ env.IMAGE_URL }}:${{ env.VERSION }} .
 
-    - name: Maven Build
-      run: mvn clean install -q
+      - name: Docker Publish
+        shell: bash
+        run: docker push ${{ env.IMAGE_URL }}:${{ env.VERSION }}
 
-    - name: Docker Build
-      run: |
-        echo "VERSION=${{ env.VERSION }}"
-        echo "MVN_VERSION=${{ env.MVN_VERSION }}"
-        docker build --platform linux/amd64 \
-          --build-arg mvn_version=${{ env.MVN_VERSION }} \
-          --build-arg version=${{ env.VERSION }} \
-          -t ${{ env.IMAGE_URL }}:${{ env.VERSION }} .
+      - name: Package helm chart
+        id: helm_package
+        shell: bash
+        run: |
+          helm_package_output=$(helm package charts/${{ vars.HELM_CHART_NAME }} \
+            --app-version ${{ env.VERSION }} \
+            --version ${{ env.VERSION }})
+          helm_artifact=$(basename -- $(echo $helm_package_output | awk '{ print $NF}'))
+          echo $helm_artifact
+          echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_OUTPUT
+          echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_ENV
 
-    - name: Docker Publish
-      shell: bash
-      run: docker push ${{ env.IMAGE_URL }}:${{ env.VERSION }}
-
-    - name: Package helm chart
-      id: helm_package
-      shell: bash
-      run: |
-        helm_package_output=$(helm package charts/${{ vars.HELM_CHART_NAME }} \
-          --app-version ${{ env.VERSION }} \
-          --version ${{ env.VERSION }})
-        helm_artifact=$(basename -- $(echo $helm_package_output | awk '{ print $NF}'))
-        echo $helm_artifact
-        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_OUTPUT
-        echo "helm_artifact=$(echo $helm_artifact)" >> $GITHUB_ENV
-
-    - name: Publish helm chart
-      shell: bash
-      run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/charts
+      - name: Publish helm chart
+        shell: bash
+        run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/charts
 
   deploy-dev:
     name: Deploy Dev
