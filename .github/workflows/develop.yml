@@ -104,7 +104,7 @@ jobs:
 
       - name: Helm repo login
         run: |
-          az acr login -n ${{ vars.ACR_NAME }}.azurecr.io  -t -ojson \
+          az acr login -n ${{ vars.ACR_NAME }}  -t -ojson \
             | jq -r .accessToken | helm registry login ${{ vars.ACR_NAME }}.azurecr.io \
             -u 00000000-0000-0000-0000-000000000000 --password-stdin
 
