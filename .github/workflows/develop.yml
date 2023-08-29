@@ -38,7 +38,7 @@ jobs:
         echo "MVN_VERSION=$(echo $MVN_VERSION)"
         MVN_RELEASE_VERSION=$(echo ${MVN_VERSION%%-*})
         echo "MVN_RELEASE_VERSION=$(echo ${MVN_RELEASE_VERSION})"
-        VERSION="${MVN_RELEASE_VERSION}-dev.${{ github.run_number }}"
+        VERSION="${MVN_RELEASE_VERSION}-${{ github.run_number }}"
         echo "VERSION=$(echo $VERSION)" >> $GITHUB_ENV
         echo "VERSION=$(echo $VERSION)" >> $GITHUB_OUTPUT
         echo "VERSION=$(echo $VERSION)"
