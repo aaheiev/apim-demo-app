@@ -95,8 +95,8 @@ jobs:
 
       - name: List env helm values
         run: |
-          ls -alph ./apiops
-
+          ls -alph ./apiops/.deploy
+          
 
 #      - name: Azure login
 #        uses: azure/login@v1
