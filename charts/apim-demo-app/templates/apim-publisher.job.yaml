@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sleep
-            - "90"
+            - "5"
           envFrom:
             - secretRef:
                 name: {{ .Values.apimPublisher.accessSecret }}

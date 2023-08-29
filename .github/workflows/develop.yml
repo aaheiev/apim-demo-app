@@ -90,12 +90,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: cd
-          repository: 'lucashuet93/apiops-vnet-github'
-          path: './apiops'
+          repository: lucashuet93/apiops-vnet-github
+          path: ./apiops
 
       - name: List env helm values
         run: |
-          ls -alph ./apiops/.deploy
+          ls -alph ./apiops
 
 
 #      - name: Azure login

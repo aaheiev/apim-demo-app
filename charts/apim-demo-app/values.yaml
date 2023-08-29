@@ -44,7 +44,7 @@ autoscaling:
 apimPublisher:
   enable: true
   image: gcacrapim.azurecr.io/apim-publisher
-  version: 4.9.0-1
+  version: 4.9.0-4
   accessSecret: apim-access
 
 apim:
