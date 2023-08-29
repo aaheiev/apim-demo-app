@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_URL: ${{ vars.ACR_NAME }}.azurecr.io/${{ vars.CONTAINER_IMAGE_NAME }}
+      HELM_EXPERIMENTAL_OCI: 1
     steps:
     - uses: actions/checkout@v3
 
@@ -72,4 +73,6 @@ jobs:
 
     - name: Publish helm chart
       shell: bash
-      run: echo "Publish helm chart ${{ env.helm_artifact }}"
+      run: |
+        echo "Publish helm chart ${{ env.helm_artifact }}"
+        helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/helm
