@@ -131,7 +131,7 @@ apim:
       }
     }
 
-  policy: |
+  policy: |-
     <policies>
     	<inbound />
     	<backend>
