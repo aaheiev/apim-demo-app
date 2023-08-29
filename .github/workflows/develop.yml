@@ -19,7 +19,7 @@ jobs:
         creds: ${{ secrets.AZURE_CI }}
 
     - name: Login ACR
-      run: az acr login --name gcacrapim
+      run: az acr login --name ${{ vars.ACR_NAME }}
 
 #    - name: Set up JDK 17
 #      uses: actions/setup-java@v3
