@@ -4,7 +4,7 @@
 
 ### set version
 ```shell
-mvn versions:set -DnewVersion=2.0.0-SNAPSHOT
+mvn versions:set -DnewVersion=2.0.1-SNAPSHOT
 ```
 
 ### get version
