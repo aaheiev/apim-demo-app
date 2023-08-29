@@ -73,6 +73,4 @@ jobs:
 
     - name: Publish helm chart
       shell: bash
-      run: |
-        echo "Publish helm chart ${{ env.helm_artifact }}"
-        helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/helm
+      run: helm push ${{ env.helm_artifact }} oci://${{ vars.ACR_NAME }}.azurecr.io/helm
