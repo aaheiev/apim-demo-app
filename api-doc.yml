@@ -2,7 +2,7 @@
 openapi: 3.0.1
 info:
   title: APIM demo app
-  version: v0
+  version: 1.0.4-SNAPSHOT
 servers:
   - url: http://localhost:8080
     description: Generated server url
