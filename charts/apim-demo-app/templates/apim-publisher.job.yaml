@@ -20,16 +20,37 @@ spec:
       restartPolicy: Never
       containers:
         - name: publisher
-          image: {{ .Values.apimPublisher.image }}
+          image: {{ .Values.apimPublisher.image }}:{{ .Values.apimPublisher.version }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - sleep
-            - "90"
+            - /usr/local/bin/publisher
+          env:
+            - name: API_MANAGEMENT_SERVICE_OUTPUT_FOLDER_PATH
+              value: /apimartifacts
+          envFrom:
+            - secretRef:
+                name: {{ .Values.apimPublisher.accessSecret }}
+            - configMapRef:
+                name: {{ .Release.Name }}-apim
           volumeMounts:
-            - name: apim-config
-              mountPath: /etc/apim
+            - mountPath: /apimartifacts/apis/{{ .Values.apim.api_name }}/apiInformation.json
+              name: api-information
+              subPath: apiInformation.json
+            - mountPath: /apimartifacts/apis/{{ .Values.apim.api_name }}/specification.yaml
+              name: api-spec
+              subPath: specification.yaml
       volumes:
-        - name: apim-config
+        - name: api-information
           configMap:
-            name: {{ .Release.Name }}
+            name: {{ .Release.Name }}-apim-artifacts
+            items:
+              - key: apiInformation.json
+                path: apiInformation.json
+        - name: api-spec
+          configMap:
+            name: {{ .Release.Name }}-apim-artifacts
+            items:
+              - key: specification.yaml
+                path: specification.yaml
+
 {{- end }}

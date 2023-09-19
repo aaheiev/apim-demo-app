@@ -7,7 +7,6 @@ image:
   pullPolicy: IfNotPresent
   tag: ""
 
-
 service:
   type: ClusterIP
   port: 80
@@ -44,48 +43,63 @@ autoscaling:
 
 apimPublisher:
   enable: true
-  image: alpine
+  image: gcacrapim.azurecr.io/apim-publisher
+  version: 4.10.1-3
+  accessSecret: azure-access
+  jobSleep: 30
 
 apim:
+  api_name: apim-be
+  name: apim-dev-55
+  resource_group: rg-apim-dev
+  apiInformation: |
+    {
+      "properties": {
+        "apiRevision": "1",
+        "displayName": "APIM BE",
+        "isCurrent": true,
+        "path": "",
+        "protocols": [
+          "https"
+        ],
+        "serviceUrl": "https://apim-be-dev.gc.bartbase.com/",
+        "subscriptionKeyParameterNames": {
+          "header": "Ocp-Apim-Subscription-Key",
+          "query": "subscription-key"
+        },
+        "subscriptionRequired": true
+      }
+    }
   openApiSpec: |
-    ---
     openapi: 3.0.1
     info:
-      title: OpenAPI definition
-      version: v0
+      title: apim-be-dev
+      version: ''
     servers:
-      - url: http://localhost:8080
-        description: Generated server url
+      - url: https://apim-dev-55.azure-api.net/apim-be
     paths:
-      "/version":
+      /version:
         get:
           tags:
             - api-controller
+          summary: getVersion
           operationId: getVersion
           responses:
             '200':
               description: OK
               content:
-                "*/*":
+                '*/*':
                   schema:
                     type: string
-      "/health":
+                  examples:
+                    default:
+                      value:
+      /reverse-name:
         get:
           tags:
             - api-controller
-          operationId: healthCheck
-          responses:
-            '200':
-              description: OK
-              content:
-                "*/*":
-                  schema:
-                    type: string
-      "/greet":
-        get:
-          tags:
-            - api-controller
-          operationId: greet
+          summary: reverseName
+          operationId: reverseName
           parameters:
             - name: name
               in: query
@@ -96,58 +110,38 @@ apim:
             '200':
               description: OK
               content:
-                "*/*":
+                '*/*':
                   schema:
                     type: string
-    components: {}
-  apiInformation: |
-    {
-      "properties": {
-        "apiRevision": "1",
-        "authenticationSettings": { },
-        "contact": {
-          "email": "apiteam@swagger.io"
-        },
-        "description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key \u0060special-key\u0060 to test the authorization filters.",
-        "displayName": "Swagger Petstore",
-        "isCurrent": true,
-        "license": {
-          "name": "Apache 2.0",
-          "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "path": "",
-        "protocols": [
-          "http",
-          "https"
-        ],
-        "serviceUrl": "https://petstore.swagger.io/v2",
-        "subscriptionKeyParameterNames": {
-          "header": "Ocp-Apim-Subscription-Key",
-          "query": "subscription-key"
-        },
-        "subscriptionRequired": true,
-        "termsOfServiceUrl": "http://swagger.io/terms/"
-      }
-    }
-
-  policy: |
-    <policies>
-    	<inbound />
-    	<backend>
-    		<forward-request />
-    	</backend>
-    	<outbound />
-    </policies>
-
-  apis: |
-    [
-      {
-        "name": "swagger-petstore"
-      },
-      {
-        "name": "swagger-petstore-v2"
-      },
-      {
-        "name": "swagger-petstore-v3"
-      }
-    ]
+                  examples:
+                    default:
+                      value:
+      /health:
+        get:
+          tags:
+            - api-controller
+          summary: healthCheck
+          operationId: healthCheck
+          responses:
+            '200':
+              description: OK
+              content:
+                '*/*':
+                  schema:
+                    type: string
+                  examples:
+                    default:
+                      value:
+    components:
+      securitySchemes:
+        apiKeyHeader:
+          type: apiKey
+          name: Ocp-Apim-Subscription-Key
+          in: header
+        apiKeyQuery:
+          type: apiKey
+          name: subscription-key
+          in: query
+    security:
+      - apiKeyHeader: [ ]
+      - apiKeyQuery: [ ]    

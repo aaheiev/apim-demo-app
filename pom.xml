@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>apim-demo-app</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<name>apim-demo-app</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>

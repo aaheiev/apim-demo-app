@@ -2,15 +2,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ .Release.Name }}"
+  name: "{{ .Release.Name }}-apim"
   labels:
 {{ include "apim-demo-app.labels" . | indent 4 }}
 data:
-  openApiSpec.yaml: |
-{{ .Values.apim.openApiSpec | nindent 4 }}
-  apiInformation.json: |
-{{ .Values.apim.apiInformation | nindent 4 }}
-  policy.xml: |
-{{ .Values.apim.policy | nindent 4 }}
-  apis.json: |
-{{ .Values.apim.apis | nindent 4 }}
+  API_MANAGEMENT_SERVICE_NAME: {{ .Values.apim.name }}
+  AZURE_RESOURCE_GROUP_NAME: {{ .Values.apim.resource_group }}
